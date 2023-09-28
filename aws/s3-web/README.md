@@ -42,7 +42,7 @@ Ensure the following are installed and set up:
 
 - **Cluster.dev client**:
   ```bash
-  install-cdev
+  curl -fsSL https://raw.githubusercontent.com/shalb/cluster.dev/master/scripts/get_cdev.sh | sh
   cdev --version
   ```
 
