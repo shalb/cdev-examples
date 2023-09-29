@@ -5,21 +5,14 @@ This guide will walk you through the steps to deploy your first project with Clu
 ## Table of Contents
 
 - [Getting Started with Cluster.dev on AWS](#getting-started-with-clusterdev-on-aws)
-  - [Table of Contents](#table-of-contents)
   - [Prerequisites](#prerequisites)
   - [Authentication](#authentication)
   - [Creating an S3 Bucket for Storing State](#creating-an-s3-bucket-for-storing-state)
   - [Setting Up Your Project](#setting-up-your-project)
-    - [Backend Configuration (`backend.yaml`)](#backend-configuration-backendyaml)
     - [Project Configuration (`project.yaml`)](#project-configuration-projectyaml)
+    - [Backend Configuration (`backend.yaml`)](#backend-configuration-backendyaml)
     - [Stack Configuration (`stack.yaml`)](#stack-configuration-stackyaml)
     - [Stack Template (`template.yaml`)](#stack-template-templateyaml)
-      - [1. **Provider Definition (`_p`)**](#1-provider-definition-_p)
-      - [2. Units](#2-units)
-        - [Bucket Unit](#bucket-unit)
-        - [Web-page Object Unit](#web-page-object-unit)
-        - [Outputs Unit](#outputs-unit)
-        - [Variables and Data Flow](#variables-and-data-flow)
     - [Sample Website File (`files/index.html`)](#sample-website-file-filesindexhtml)
   - [Deploying with Cluster.dev](#deploying-with-clusterdev)
 
@@ -85,21 +78,6 @@ aws s3 mb s3://cdev-states
 
 ## Setting Up Your Project
 
-### Backend Configuration (`backend.yaml`)
-
-This specifies where cluster.dev will store own state the Terraform states for any infrastructure it provisions or manages. Given the backend type as s3, it's clear that AWS is the chosen cloud provider.
-
-```bash
-cat <<EOF > backend.yaml
-name: aws-backend
-kind: Backend
-provider: s3
-spec:
-  bucket: {{ .project.variables.state_bucket_name }}
-  region: {{ .project.variables.region }}
-EOF
-```
-
 ### Project Configuration (`project.yaml`)
 
 *   Defines the overarching project settings. All subsequent stack configurations will inherit and can override these settings.
@@ -114,7 +92,22 @@ backend: aws-backend
 variables:
   organization: cluster.dev
   region: eu-central-1
-  state_bucket_name: test-tmpl-dev
+  state_bucket_name: cdev-states
+EOF
+```
+
+### Backend Configuration (`backend.yaml`)
+
+This specifies where cluster.dev will store own state the Terraform states for any infrastructure it provisions or manages. Given the backend type as s3, it's clear that AWS is the chosen cloud provider.
+
+```bash
+cat <<EOF > backend.yaml
+name: aws-backend
+kind: Backend
+provider: s3
+spec:
+  bucket: {{ .project.variables.state_bucket_name }}
+  region: {{ .project.variables.region }}
 EOF
 ```
 
@@ -195,7 +188,8 @@ units:
 EOF
 ```
 
-Lets check what is inside this template
+<details>
+  <summary>Click to expand explanation of the StackTemplate</summary>
 
 #### 1. **Provider Definition (`_p`)**
 
@@ -255,6 +249,8 @@ outputs:
 
 The StackTemplate is adept at harnessing variables, not just from the Stack (e.g., stack.yaml), but also from other resources via the remoteState function. This facilitates a seamless flow of data between resources and units, enabling dynamic infrastructure creation based on real-time cloud resource states and user-defined variables.
 
+</details>
+
 ### Sample Website File (`files/index.html`)
 
 ```bash
@@ -285,6 +281,12 @@ EOF
 
    ```bash
    cdev apply
+   ```
+
+3. Clean-up:
+
+   ```bash
+   cdev destroy
    ```
 
 ---
