@@ -1,0 +1,7 @@
+name: azure-backend
+kind: Backend
+provider: local
+spec:
+  resource_group_name: cdevResourceGroup
+  storage_account_name: {{ .project.variables.state_storage_account_name }}
+  container_name: tfstate

@@ -1,0 +1,75 @@
+_p: &provider_azurerm
+- azurerm:
+    features:
+      resource_group:
+        prevent_deletion_if_contains_resources: false
+
+_globals: &global_settings
+  default_region: "region1"
+  regions:
+    region1: {{ .variables.location }}
+  prefixes: ["dev"]
+  random_length: 4
+  passthrough: false
+  use_slug: false
+  inherit_tags: false
+
+_version: &module_version 5.7.5
+
+name: azure-static-website
+kind: StackTemplate
+units:
+  -
+    name: resource-group
+    type: tfmodule
+    providers: *provider_azurerm
+    source: aztfmod/caf/azurerm//modules/resource_group
+    version: *module_version
+    inputs:
+      global_settings: *global_settings
+      resource_group_name: {{ .variables.resource_group_name }}
+      settings:
+        region: "region1"
+  -
+    name: storage-account
+    type: tfmodule
+    providers: *provider_azurerm
+    source: aztfmod/caf/azurerm//modules/storage_account
+    version: *module_version
+    inputs:
+      base_tags: false
+      global_settings: *global_settings
+      client_config:
+        key: demo
+      resource_group:
+        name: {{ remoteState "this.resource-group.name" }}
+        location: {{ remoteState "this.resource-group.location" }}
+      storage_account:
+        name: {{ .variables.storage_account_name }}
+        account_kind: "StorageV2"
+        account_tier: "Standard"
+        static_website:
+          index_document: "index.html"
+          error_404_document: "error.html"
+      var_folder_path: "./"
+  -
+    name: web-page-blob
+    type: tfmodule
+    providers: *provider_azurerm
+    source: aztfmod/caf/azurerm//modules/storage_account/blob
+    version: *module_version
+    inputs:
+      settings:
+        name: "index.html"
+        content_type: "text/html"
+        source_content: |
+          {{- .variables.file_content | nindent 12 }}
+      storage_account_name: {{ remoteState "this.storage-account.name" }}
+      storage_container_name: "$web"
+      var_folder_path: "./"
+  -
+    name: outputs
+    type: printer
+    depends_on: this.web-page-blob
+    outputs:
+      websiteUrl: https://{{ remoteState "this.storage-account.primary_web_host" }}

@@ -1,0 +1,10 @@
+name: az-blob-website
+template: ./template/
+kind: Stack
+backend: azure-backend
+variables:
+  storage_account_name: "tmpldevtest"
+  resource_group_name: "demo-resource-group"
+  location: {{ .project.variables.location }}
+  file_content: |
+    {{- readFile "./files/index.html" | nindent 4 }}

@@ -1,0 +1,7 @@
+name: dev
+kind: Project
+backend: azure-backend
+variables:
+  organization: cluster.dev
+  location: francecentral
+  state_storage_account_name: cdevstates
