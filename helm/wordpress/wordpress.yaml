@@ -1,0 +1,8 @@
+name: wordpress
+template: "./template/"
+kind: Stack
+backend: aws-backend
+cliVersion: ">= 0.7.14"
+variables:
+  kubeconfig_path: "/data/home/voa/projects/cdev-aws-eks/examples/kubeconfig"
+  domain: demo.cluster.dev

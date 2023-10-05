@@ -1,0 +1,56 @@
+kind: StackTemplate
+name: wordpress
+cliVersion: ">= 0.7.15"
+
+units:
+## Generate Passwords with Terraform for MySQL and Wordpress
+  -
+    name: mysql-wp-pass-user
+    type: tfmodule
+    source: github.com/romanprog/terraform-password?ref=0.0.1
+    inputs:
+      length: 12
+      special: false
+  -
+    name: wp-pass
+    type: tfmodule
+    source: github.com/romanprog/terraform-password?ref=0.0.1
+    inputs:
+      length: 12
+      special: false
+## Install MySQL and Wordpress with Helm
+  -
+    name: mysql-wordpress
+    type: helm
+    kubeconfig: {{ .variables.kubeconfig_path }}
+    source:
+      repository: "oci://registry-1.docker.io/bitnamicharts"
+      chart: "mysql"
+      version: "9.9.1"
+    additional_options:
+      namespace: "wordpress"
+      create_namespace: true
+    values:
+      - file: ./files/mysql.yaml
+  -
+    name: wordpress
+    type: helm
+    depends_on: this.mysql-wordpress
+    kubeconfig: {{ .variables.kubeconfig_path }}
+    source:
+      repository: "oci://registry-1.docker.io/bitnamicharts"
+      chart: "wordpress"
+      version: "16.1.2"
+    additional_options:
+      namespace: "wordpress"
+      create_namespace: true
+    values:
+      - file: ./files/wordpress.yaml
+
+  - name: outputs
+    type: printer
+    depends_on: this.wordpress
+    outputs:
+      wordpress_url: https://wordpress.{{ .variables.domain }}/admin/
+      wordpress_user: user
+      wordpress_password: {{ remoteState "this.wp-pass.result" }}

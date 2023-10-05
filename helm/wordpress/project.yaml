@@ -1,0 +1,6 @@
+name: wordpress-demo
+kind: Project
+backend: aws-backend
+variables:
+  region: eu-central-1
+  state_bucket_name: cdev-states
