@@ -1,0 +1,25 @@
+_p: &provider_gcp
+- google:
+    project: {{ .variables.project }}
+    region: {{ .variables.region }}
+
+name: l
+kind: StackTemplate
+units:
+  -
+    name: cloud-storage
+    type: tfmodule
+    providers: *provider_gcp
+    source: "../tf"
+    inputs:
+      name: {{ .variables.bucket_name }}
+      project_id: {{ .variables.project }}
+      location: "EU"
+      content: |
+        {{- .variables.content | nindent 8 }}
+  -
+    name: outputs
+    type: printer
+    depends_on: this.cloud-storage
+    outputs:
+      websiteUrl: {{ remoteState "this.cloud-storage.index-url" }}

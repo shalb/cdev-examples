@@ -1,0 +1,11 @@
+name: cloud-storage
+template: ./template/
+kind: Stack
+backend: gcs-backend
+variables:
+  bucket_name: "dev-test"
+  region: {{ .project.variables.region }}
+  project: {{ .project.variables.project }}
+  organization: {{ .project.variables.organization }}
+  content: |
+    {{- readFile "./files/index.html" | nindent 4 }}

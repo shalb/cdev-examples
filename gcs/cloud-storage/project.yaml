@@ -1,0 +1,9 @@
+name: dev
+kind: Project
+backend: gcs-backend
+variables:
+  organization: my-organization
+  project: cdev-demo
+  region: us-west1
+  state_bucket_name: gke-demo-state
+  state_bucket_prefix: dev
