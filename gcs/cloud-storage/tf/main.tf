@@ -15,7 +15,6 @@ locals {
   }
 }
 
-# [START cloudloadbalancing_ext_http_gce_plus_bucket]
 module "gce-lb-https" {
   source            = "GoogleCloudPlatform/lb-http/google"
   version           = "9.2.0"
@@ -108,8 +107,6 @@ resource "google_storage_object_acl" "index-acl" {
   object         = google_storage_bucket_object.index.name
   predefined_acl = "publicRead"
 }
-# [END cloudloadbalancing_ext_http_gce_plus_bucket]
-
 
 resource "tls_private_key" "example" {
   algorithm = "RSA"
