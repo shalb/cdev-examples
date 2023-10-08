@@ -1,13 +1,13 @@
-# Getting Started with Cluster.dev on AWS
+# Getting Started with Cluster.dev on GCS
 
-This guide will walk you through the steps to deploy your first project with Cluster.dev on AWS.
+This guide will walk you through the steps to deploy your first project with Cluster.dev on GCS.
 
 ## Table of Contents
 
-- [Getting Started with Cluster.dev on AWS](#getting-started-with-clusterdev-on-aws)
+- [Getting Started with Cluster.dev on GCS](#getting-started-with-clusterdev-on-gcs)
   - [Prerequisites](#prerequisites)
   - [Authentication](#authentication)
-  - [Creating an S3 Bucket for Storing State](#creating-an-s3-bucket-for-storing-state)
+  - [Creating an Storage Bucket for Storing State](#creating-an-storage-bucket-for-storing-state)
   - [Setting Up Your Project](#setting-up-your-project)
     - [Project Configuration (`project.yaml`)](#project-configuration-projectyaml)
     - [Backend Configuration (`backend.yaml`)](#backend-configuration-backendyaml)

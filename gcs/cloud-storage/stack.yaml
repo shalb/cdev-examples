@@ -3,7 +3,7 @@ template: ./template/
 kind: Stack
 backend: gcs-backend
 variables:
-  bucket_name: "dev-test"
+  name: {{ .project.variables.name }}
   region: {{ .project.variables.region }}
   project: {{ .project.variables.project }}
   organization: {{ .project.variables.organization }}
