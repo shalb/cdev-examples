@@ -24,7 +24,7 @@ units:
         main_page_suffix: "index.html"
         not_found_page: "index.html"
   -
-    name: cloud-storage-bucket-object
+    name: cloud-bucket-object
     type: tfmodule
     providers: *provider_gcp
     depends_on: this.cloud-storage
