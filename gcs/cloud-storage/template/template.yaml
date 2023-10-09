@@ -1,7 +1,7 @@
 _p: &provider_gcp
 - google:
-    project: {{ .variables.project }}
-    region: {{ .variables.region }}
+    project: {{ .variables.google_project_id }}
+    region: {{ .variables.google_cloud_region }}
 
 name: gcs-static-website
 kind: StackTemplate
@@ -13,10 +13,10 @@ units:
     source: "github.com/terraform-google-modules/terraform-google-cloud-storage.git?ref=v4.0.1"
     inputs:
       names:
-        - {{ .variables.name }}
+        - {{ .variables.project_name }}
       randomize_suffix: true
-      project_id: {{ .variables.project }}
-      location: {{ .variables.location }}
+      project_id: {{ .variables.google_project_id }}
+      location: {{ .variables.google_cloud_bucket_location }}
       set_viewer_roles: true
       viewers:
         - allUsers
@@ -34,7 +34,7 @@ units:
       bucket_name: {{ remoteState "this.cloud-storage.name" }}
       object_name: "index.html"
       object_content: |
-        {{- .variables.content | nindent 8 }}
+        {{- .variables.web_page_content | nindent 8 }}
   -
     name: cloud-url-map
     type: tfmodule
@@ -42,7 +42,7 @@ units:
     depends_on: this.cloud-storage
     source: "github.com/shalb/terraform-gcs-bucket-backend.git?ref=0.0.1"
     inputs:
-      name: {{ .variables.name }}
+      name: {{ .variables.project_name }}
       bucket_name: {{ remoteState "this.cloud-storage.name" }}
   -
     name: cloud-lb
@@ -52,8 +52,8 @@ units:
     source: "GoogleCloudPlatform/lb-http/google"
     version: "9.2.0"
     inputs:
-      name: {{ .variables.name }}
-      project: {{ .variables.project }}
+      name: {{ .variables.project_name }}
+      project: {{ .variables.google_project_id }}
       url_map: {{ remoteState "this.cloud-url-map.url_map_self_link" }}
       create_url_map: false
       ssl: false
