@@ -16,7 +16,7 @@ units:
         - {{ .variables.name }}
       randomize_suffix: true
       project_id: {{ .variables.project }}
-      location: "EU"
+      location: {{ .variables.location }}
       set_viewer_roles: true
       viewers:
         - allUsers
