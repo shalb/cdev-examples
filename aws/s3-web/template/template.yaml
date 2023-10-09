@@ -2,7 +2,7 @@ _p: &provider_aws
 - aws:
     region: {{ .variables.region }}
 
-name: l
+name: s3-website
 kind: StackTemplate
 units:
   -
