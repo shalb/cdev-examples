@@ -3,7 +3,7 @@ _p: &provider_gcp
     project: {{ .variables.project }}
     region: {{ .variables.region }}
 
-name: l
+name: gcs-static-website
 kind: StackTemplate
 units:
   -
