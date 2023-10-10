@@ -1,0 +1,7 @@
+name: gcs-backend
+kind: Backend
+provider: gcs
+spec:
+  project: {{ .project.variables.google_project_id }}
+  bucket: {{ .project.variables.google_bucket_name }}
+  prefix: {{ .project.variables.google_bucket_prefix }}

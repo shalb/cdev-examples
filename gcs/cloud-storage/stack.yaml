@@ -1,0 +1,11 @@
+name: cloud-storage
+template: ./template/
+kind: Stack
+backend: gcs-backend
+variables:
+  project_name: {{ .project.variables.project_name }}
+  google_cloud_region: {{ .project.variables.google_cloud_region }}
+  google_cloud_bucket_location: {{ .project.variables.google_cloud_bucket_location }}
+  google_project_id: {{ .project.variables.google_project_id }}
+  web_page_content: |
+    {{- readFile "./files/index.html" | nindent 4 }}

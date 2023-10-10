@@ -1,0 +1,81 @@
+_p: &provider_gcp
+- google:
+    project: {{ .variables.google_project_id }}
+    region: {{ .variables.google_cloud_region }}
+
+name: gcs-static-website
+kind: StackTemplate
+units:
+  -
+    name: cloud-storage
+    type: tfmodule
+    providers: *provider_gcp
+    source: "github.com/terraform-google-modules/terraform-google-cloud-storage.git?ref=v4.0.1"
+    inputs:
+      names:
+        - {{ .variables.project_name }}
+      randomize_suffix: true
+      project_id: {{ .variables.google_project_id }}
+      location: {{ .variables.google_cloud_bucket_location }}
+      set_viewer_roles: true
+      viewers:
+        - allUsers
+      website:
+        main_page_suffix: "index.html"
+        not_found_page: "index.html"
+  -
+    name: cloud-bucket-object
+    type: tfmodule
+    providers: *provider_gcp
+    depends_on: this.cloud-storage
+    source: "bootlabstech/cloud-storage-bucket-object/google"
+    version: "1.0.1"
+    inputs:
+      bucket_name: {{ remoteState "this.cloud-storage.name" }}
+      object_name: "index.html"
+      object_content: |
+        {{- .variables.web_page_content | nindent 8 }}
+  -
+    name: cloud-url-map
+    type: tfmodule
+    providers: *provider_gcp
+    depends_on: this.cloud-storage
+    source: "github.com/shalb/terraform-gcs-bucket-backend.git?ref=0.0.1"
+    inputs:
+      name: {{ .variables.project_name }}
+      bucket_name: {{ remoteState "this.cloud-storage.name" }}
+  -
+    name: cloud-lb
+    type: tfmodule
+    providers: *provider_gcp
+    depends_on: this.cloud-url-map
+    source: "GoogleCloudPlatform/lb-http/google"
+    version: "9.2.0"
+    inputs:
+      name: {{ .variables.project_name }}
+      project: {{ .variables.google_project_id }}
+      url_map: {{ remoteState "this.cloud-url-map.url_map_self_link" }}
+      create_url_map: false
+      ssl: false
+      backends:
+        default:
+          protocol: "HTTP"
+          port: 80
+          port_name: "http"
+          timeout_sec: 10
+          enable_cdn: false
+          groups: [] 
+          health_check:
+            request_path: "/"
+            port: 80
+          log_config:
+            enable: true
+            sample_rate: 1.0
+          iap_config:
+            enable: false
+  -
+    name: outputs
+    type: printer
+    depends_on: this.cloud-storage
+    outputs:
+      websiteUrl: http://{{ remoteState "this.cloud-lb.external_ip" }}

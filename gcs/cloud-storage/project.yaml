@@ -1,0 +1,10 @@
+name: dev
+kind: Project
+backend: gcs-backend
+variables:
+  project_name: dev-test
+  google_project_id: cdev-demo
+  google_cloud_region: us-west1
+  google_cloud_bucket_location: EU
+  google_bucket_name: gke-demo-state
+  google_bucket_prefix: dev
