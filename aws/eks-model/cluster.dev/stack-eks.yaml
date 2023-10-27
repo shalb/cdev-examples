@@ -1,0 +1,71 @@
+name: cluster
+template: "https://github.com/shalb/cdev-aws-eks?ref=main"
+kind: Stack
+backend: aws-backend
+cliVersion: ">= 0.7.14"
+variables:
+  region: {{ .project.variables.region }}
+  organization: {{ .project.variables.organization }}
+  cluster_name: k8s-model
+  domain: cluster.dev
+  eks_version: "1.28"
+  environment: "demo"
+  eks_addons:
+    enable_argocd: false
+    enable_nginx: true
+    enable_external_secrets: true
+    enable_cluster_autoscaler: true
+    enable_aws_lb_controller: true
+    enable_external_dns: true
+    enable_cert_manager: true
+    enable_efs: false
+    enable_cert_manager_http_issuers: true
+    enable_metrics_server: true
+    enable_reloader: true
+  eks_managed_node_groups:
+    cpu-nodes:
+      capacity_type: SPOT
+      desired_size: 1
+      disk_size: 200
+      force_update_version: true
+      instance_types:
+        - "t3.large"
+        - "t3a.large"
+        - "m5.large"
+      labels: {}
+      max_size: 2
+      min_size: 1
+      name: spot-cpu-nodes
+      subnet_ids: {{ remoteState "cluster.vpc.private_subnets" }}
+      taints: []
+      update_config:
+        max_unavailable: 1
+      iam_role_additional_policies:
+        ebspolicy: "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+    gpu-nodes:
+      ami_type: AL2_x86_64_GPU
+      capacity_type: SPOT
+      desired_size: 1
+      block_device_mappings:
+        xvda:
+          device_name: "/dev/xvda"
+          ebs:
+            volume_size: 120
+            volume_type: "gp3"
+            delete_on_termination: true
+      force_update_version: true
+      instance_types:
+        - "g5.xlarge"
+        #- "g4dn.2xlarge"
+      labels:
+        gpu-type: "tesla-t4"
+      max_size: 1
+      min_size: 1
+      name: spot-gpu-nodes
+      subnet_ids: {{ remoteState "cluster.vpc.private_subnets" }}
+      taints: []
+      update_config:
+        max_unavailable: 1
+      iam_role_additional_policies:
+        ebspolicy: "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+        s3policy: "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"

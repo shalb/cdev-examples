@@ -1,0 +1,8 @@
+name: dev
+kind: Project
+backend: aws-backend
+variables:
+  organization: my-company # sample global variable
+  region: eu-central-1
+  state_bucket_name: cdev-state # create and set your s3 bucket here
+
