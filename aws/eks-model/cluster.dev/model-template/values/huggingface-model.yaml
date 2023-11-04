@@ -15,7 +15,7 @@ huggingface:
     - "1"
 
 replicaCount: 1
-kind: deployment
+kind: Deployment
 
 image:
   repo: ghcr.io/huggingface/text-generation-inference

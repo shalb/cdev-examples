@@ -5,7 +5,7 @@ backend: aws-backend
 cliVersion: ">= 0.8.0"
 variables:
   namespace: model
-  kubeconfig: {{ output "cluster.kubeconfig.path" }}
+  kubeconfig: {{ output "cluster.kubeconfig.kubeconfig_path" }}
   model:
     organization: "HuggingFaceH4"
     name: "zephyr-7b-beta"

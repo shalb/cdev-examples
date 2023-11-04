@@ -44,7 +44,7 @@ variables:
         ebspolicy: "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
     gpu-nodes:
       ami_type: AL2_x86_64_GPU
-      capacity_type: SPOT
+      capacity_type: ON_DEMAND
       desired_size: 1
       block_device_mappings:
         xvda:

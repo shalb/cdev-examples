@@ -6,8 +6,8 @@ units:
     type: helm
     source:
       chart: "huggingface-model"
-      version: "0.0.1"
-    kubeconfig: {{ .variables.kubeconfig_path }}
+      version: "0.0.5"
+    kubeconfig: {{ .variables.kubeconfig }}
     values:
       - file: ./values/huggingface-model.yaml
     additional_options:
