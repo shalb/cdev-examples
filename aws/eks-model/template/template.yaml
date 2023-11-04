@@ -1,0 +1,27 @@
+name: model
+kind: StackTemplate
+units:
+  -
+    name: model
+    type: helm
+    source:
+      chart: "huggingface-model"
+      version: "0.0.1"
+    kubeconfig: {{ .variables.kubeconfig_path }}
+    values:
+      - file: ./values/huggingface-model.yaml
+    additional_options:
+      repository: oci://registry-1.docker.io/shalb
+      namespace: {{ .variables.namespace }}
+      create_namespace: true
+      wait: false
+    {{- if .variables.bl_limit.values_overrides }}
+    inputs:
+      {{- .variables.bl_limit.values_overrides | toYaml | nindent 6 }}
+    {{- end }}
+  -
+    name: outputs
+    type: printer
+    depends_on: this.web-page-object
+    outputs:
+      Deployed: true
