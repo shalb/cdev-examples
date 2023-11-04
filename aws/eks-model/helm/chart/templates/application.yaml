@@ -1,5 +1,5 @@
 {{- if or ( not .Values.model ) ( or (not .Values.model.name) (not .Values.model.organization) ) -}}
-{{- fail "model.name and model.id are required but not set!" -}}
+{{- fail "model.name and model.organization are required but not set!" -}}
 {{- end }}
 {{- $kind := .Values.kind | default "deployment" }}
 {{- $namePrefix := include "huggingface-model.fullname" . | trunc 63 | trimSuffix "-" -}}
@@ -75,7 +75,7 @@ spec:
             - "--weights-cache-override"
             - "/usr/src/{{ .Values.model.name }}"
             {{- with .Values.huggingface.args }}
-            {{ toYaml . | indent 12 }}
+            {{- toYaml . | nindent 12 }}
             {{- end }}
           ports:
             - containerPort: {{ include "huggingface-model.containerPort" . }}
