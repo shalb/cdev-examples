@@ -13,7 +13,6 @@ huggingface:
     - "bitsandbytes"
     - "--num-shard"
     - "1"
-
 replicaCount: 1
 kind: deployment
 
