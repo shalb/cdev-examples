@@ -3,7 +3,7 @@ model:
   name: "zephyr-7b-beta"
 init:
   s3:
-    enabled: true
+    enabled: false
     bucketURL: s3://k8s-model-zephyr/llm/deployment/zephyr-7b-beta/
 
 huggingface:
@@ -14,7 +14,7 @@ huggingface:
     - "--num-shard"
     - "1"
 replicaCount: 1
-kind: deployment
+kind: Deployment
 
 image:
   repo: ghcr.io/huggingface/text-generation-inference
