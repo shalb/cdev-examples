@@ -1,18 +1,22 @@
 model:
-  organization: "HuggingFaceH4"
-  name: "zephyr-7b-beta"
+  organization: "WizardLM"
+  name: "WizardCoder-Python-13B-V1.0"
 init:
   s3:
     enabled: false
-    bucketURL: s3://k8s-model-zephyr/llm/deployment/zephyr-7b-beta/
+    bucketURL: s3://k8s-model-zephyr/llm/deployment/wizard-7b-uncensored
 
 huggingface:
   containerPort: 8080
   args:
-    - "--quantize"
-    - "bitsandbytes"
-    - "--num-shard"
-    - "1"
+    - "--max-total-tokens"
+    - "4048"
+    - "--max-input-length"
+    - "3096"
+    #- --quantize
+    #- "awq"
+    #- "--num-shard"
+    #- "1"
 replicaCount: 1
 kind: Deployment
 
@@ -32,12 +36,12 @@ service:
   type: "ClusterIP"
 
 serviceAccount:
-  create: true
+  create: false
 
 resources:
-  requests:
-    cpu: "3"
-    memory: "10Gi"
+  #requests:
+  #  cpu: "3"
+  #  memory: "10Gi"
   limits:
     nvidia.com/gpu: 1
 

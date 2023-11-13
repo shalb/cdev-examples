@@ -4,4 +4,6 @@ kind: Stack
 backend: aws-backend
 cliVersion: ">= 0.8.0"
 variables:
-  
+  model:
+    organization: "HuggingFaceH4"
+    name: "zephyr-7b-beta"

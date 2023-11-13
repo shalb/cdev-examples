@@ -1,0 +1,18 @@
+kind: StackTemplate
+name: hfmodel
+cliVersion: ">= 0.7.15"
+
+units:
+  -
+    name: model
+    type: helm
+    kubeconfig: {{ .variables.kubeconfig_path }}
+    source:
+      repository: "oci://registry-1.docker.io/bitnamicharts"
+      chart: "mysql"
+      version: "9.9.1"
+    additional_options:
+      namespace: "wordpress"
+      create_namespace: true
+    values:
+      - file: ./files/mysql.yaml
