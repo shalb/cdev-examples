@@ -1,10 +1,10 @@
 model:
-  organization: "WizardLM"
-  name: "WizardCoder-Python-13B-V1.0"
+  organization: "HuggingFaceH4"
+  name: "zephyr-7b-beta"
 init:
   s3:
-    enabled: false
-    bucketURL: s3://k8s-model-zephyr/llm/deployment/wizard-7b-uncensored
+    enabled: true
+    bucketURL: s3://k8s-model-zephyr/llm/deployment/zephyr-7b-beta
 
 huggingface:
   containerPort: 8080
@@ -19,7 +19,8 @@ huggingface:
     #- "1"
 replicaCount: 1
 kind: Deployment
-
+updateStrategy:
+  type: Recreate
 image:
   repo: ghcr.io/huggingface/text-generation-inference
   tag: "latest"
@@ -30,13 +31,6 @@ persistence:
   - ReadWriteOnce
   storageClassName: gp2
   storage: 100Gi
-
-service:
-  port: 8080
-  type: "ClusterIP"
-
-serviceAccount:
-  create: false
 
 resources:
   #requests:

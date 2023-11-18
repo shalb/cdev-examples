@@ -2,7 +2,7 @@ name: cluster
 template: "https://github.com/shalb/cdev-aws-eks?ref=main"
 kind: Stack
 backend: aws-backend
-cliVersion: ">= 0.7.14"
+cliVersion: ">= 0.8.0"
 variables:
   region: {{ .project.variables.region }}
   organization: {{ .project.variables.organization }}
@@ -13,7 +13,7 @@ variables:
   eks_addons:
     enable_argocd: false
     enable_nginx: true
-    enable_external_secrets: true
+    enable_external_secrets: false
     enable_cluster_autoscaler: true
     enable_aws_lb_controller: true
     enable_external_dns: true
@@ -21,12 +21,18 @@ variables:
     enable_efs: false
     enable_cert_manager_http_issuers: true
     enable_metrics_server: true
-    enable_reloader: true
+    enable_reloader: false
   eks_managed_node_groups:
     cpu-nodes:
       capacity_type: SPOT
       desired_size: 1
-      disk_size: 200
+      block_device_mappings:
+        xvda:
+          device_name: "/dev/xvda"
+          ebs:
+            volume_size: 60
+            volume_type: "gp3"
+            delete_on_termination: true
       force_update_version: true
       instance_types:
         - "t3.large"
@@ -44,8 +50,7 @@ variables:
         ebspolicy: "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
     gpu-nodes:
       ami_type: AL2_x86_64_GPU
-      capacity_type: SPOT
-      desired_size: 1
+      capacity_type: ON_DEMAND
       block_device_mappings:
         xvda:
           device_name: "/dev/xvda"
@@ -56,12 +61,12 @@ variables:
       force_update_version: true
       instance_types:
         - "g5.xlarge"
-        #- "g4dn.2xlarge"
       labels:
-        gpu-type: "tesla-t4"
+        gpu-type: "a10g"
       max_size: 1
-      min_size: 1
-      name: spot-gpu-nodes
+      desired_size: 1
+      min_size: 0
+      name: ondemand-gpu-nodes
       subnet_ids: {{ remoteState "cluster.vpc.private_subnets" }}
       taints: []
       update_config:
