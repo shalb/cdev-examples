@@ -2,7 +2,7 @@ name: model
 template: "./model-template"
 kind: Stack
 backend: aws-backend
-cliVersion: ">= 0.8.0"
+cliVersion: ">= 0.8.2"
 variables:
   kubeconfig: {{ output "cluster.outputs.kubeconfig_path" }}
   namespace: default

@@ -13,11 +13,14 @@ units:
       chart: "huggingface-model"
       version: "0.0.23"
     kubeconfig: {{ .variables.kubeconfig }}
-    values: {{ insertYAML .variables.chart }}
+    values:
+      - set: {{ insertYAML .variables.chart }}
     additional_options:
       repository: oci://registry-1.docker.io/shalb
       namespace: {{ .variables.namespace }}
       create_namespace: true
+    timeout: 30m
+    wait: false
   -
     name: outputs
     type: printer
