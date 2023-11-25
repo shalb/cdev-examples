@@ -11,7 +11,7 @@ units:
     type: helm
     source:
       chart: "huggingface-model"
-      version: "0.0.23"
+      version: {{ .variables.chart.version }}
     kubeconfig: {{ .variables.kubeconfig }}
     values:
       - set: {{ insertYAML .variables.chart }}
@@ -19,8 +19,7 @@ units:
       repository: oci://registry-1.docker.io/shalb
       namespace: {{ .variables.namespace }}
       create_namespace: true
-    timeout: 30m
-    wait: false
+      timeout: 1200
   -
     name: outputs
     type: printer

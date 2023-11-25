@@ -2,7 +2,7 @@ name: cluster
 template: "https://github.com/shalb/cdev-aws-eks?ref=main"
 kind: Stack
 backend: aws-backend
-cliVersion: ">= 0.8.0"
+cliVersion: ">= 0.8.2"
 variables:
   region: {{ .project.variables.region }}
   organization: {{ .project.variables.organization }}
@@ -73,4 +73,4 @@ variables:
         max_unavailable: 1
       iam_role_additional_policies:
         ebspolicy: "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
-        s3policy: "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+        s3policy: "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess" # required to download model from s3(adjust permissions)
