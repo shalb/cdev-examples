@@ -13,6 +13,7 @@ units:
       chart: "huggingface-model"
       version: {{ .variables.chart.version }}
     kubeconfig: {{ .variables.kubeconfig }}
+    depends_on: this.nvidia-device-plugin
     values:
       - set: {{ insertYAML .variables.chart }}
     additional_options:
