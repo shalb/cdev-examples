@@ -9,7 +9,7 @@ authors:
 
 # Deploy HF Models and Chat to Kubernetes in 30 minutes
 
-![HuggingFace Cluster.de](./cluster.dev/assets/hf_thumbnail.png)
+![HuggingFace Cluster.de](../../assets/hf_thumbnail.png)
 
 The goal in this article to show users how they could launch any LLM model from HuggingFace Hub with Chat into AWS cloud account on top of Kubernetes and make this production ready.
 
