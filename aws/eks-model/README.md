@@ -40,8 +40,10 @@ But this could be adapted for any other cloud and Kuberentes version.
 ### Prerequisites
 
 - AWS cloud account credentials.
+- [AWS Quota](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-resource-limits.html#request-increase) change is requested for G5 or other desired types of instances.
 - [Cluster.dev](https://docs.cluster.dev/installation-upgrade/) and [Terraform](https://developer.hashicorp.com/terraform/downloads) installed.
-- Route53 domain(optional)
+- Route53 DNS zone (optional).
+- Select HuggingFace model with .safetensors weights from Hub. Or you can upload model to s3 bucket, see example in [bootstrap.ipynb](bootstrap.ipynb)
 
 Create an S3 Bucket for storing state files:
 
@@ -163,19 +165,27 @@ So lets imagine some tasks we can perform on top of the stack.
 
 ### Interacting with Kubernetes
 
-After the stack would be deployed you will get the `kubeconfig` file that could be used for authorization to cluster and check workloads, logs etc..
+After the stack would be deployed you will get the `kubeconfig` file that could be used for authorization to cluster and check workloads, logs etc..:
 
 ```bash
 # First we need to export KUBECONFIG to use kubectl
 export KUBECONFIG=`pwd`/kubeconfig
 # Then we can examine workloads deployed in `default` namespace, since we define it in stack-model.yaml
 kubectl get pod
-# To get logs from model run
-kubectl logs -f <output pod from kubectl get pod>
-# To list services 
+# To get logs from model startup, check if model is loaded without errors
+kubectl logs -f <output model pod name from kubectl get pod>
+# To list services (should be model, chat and mongo if chat enabled)
+kubectl get svc
+# Then you can port-forward service to your host
+kubectl port-forward svc/<model-output from above>  8080:8080
+# Now you can chat with your model
+curl 127.0.0.1:8080/generate \
+    -X POST \
+    -d '{"inputs":"Continue funny story: John decide to stick finger into outlet","parameters":{"max_new_tokens":1000}}' \
+    -H 'Content-Type: application/json'
 ```
 
-### Changing node size and type
+### Changing nodes size and type
 
 Lets imagine we have a large model and we need to serve it with some really large instances.
 But we'd like to use spot-instances which are cheeper.
@@ -214,4 +224,34 @@ In case you need to change the model, also just edit its name and organization:
       name: "WizardCoder-15B-V1.0"
 ```
 
+And then just apply changes by running `cdev apply`.
 
+### Enabling Chat-UI
+
+To enable Chat-UI, you need just to set `chart.chat.enable:true`. You will get a service that could be port-forwarded and used from browser. If you need to expose chat to external users, just to add `ingress` configuration, like in that sample:
+
+```yaml
+    chat:
+      enabled: true
+      modelConfig:
+      extraEnvVars:
+        - name: PUBLIC_ORIGIN
+          value: "http://localhost:8080"
+      ingress:
+        enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: "letsencrypt-prod"
+        hosts:
+          - host: chat.k8s-model.cluster.dev
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - hosts:
+              - chat.k8s-model.cluster.dev
+            secretName: huggingface-model-chat
+```
+
+Note that if you are using `cluster.dev` domain with your project prefix(please make it unique) the DNS zone would be auto configured.
+
+Also if you'd like to expose API for your model, you can set the Ingress in corresponded model section.
