@@ -1,0 +1,29 @@
+name: hfmodel
+kind: StackTemplate
+units:
+  -
+    name: nvidia-device-plugin
+    type: kubernetes
+    source: ./files/nvidia-device-plugin.yml
+    kubeconfig: {{ .variables.kubeconfig }}
+  -
+    name: model
+    type: helm
+    source:
+      chart: "huggingface-model"
+      version: {{  default "0.1.7" .variables.chart.version }}
+    kubeconfig: {{ .variables.kubeconfig }}
+    depends_on: this.nvidia-device-plugin
+    values:
+      - set: {{ insertYAML .variables.chart }}
+    additional_options:
+      repository: oci://registry-1.docker.io/shalb
+      namespace: {{ .variables.namespace }}
+      create_namespace: true
+      timeout: 1200
+  -
+    name: outputs
+    type: printer
+    depends_on: this.model
+    outputs:
+      Deployed: "true"

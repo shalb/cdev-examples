@@ -1,0 +1,45 @@
+name: model
+template: "./model-template"
+kind: Stack
+backend: aws-backend
+cliVersion: ">= 0.8.2"
+variables:
+  kubeconfig: {{ output "cluster.outputs.kubeconfig_path" }}
+  namespace: default
+  chart:
+    # See all available options in https://github.com/shalb/charts/blob/main/huggingface-model/values.yaml
+    model:
+      organization: "HuggingFaceH4"
+      name: "zephyr-7b-beta"
+    init:
+      s3:
+        enabled: true
+        bucketURL: s3://k8s-model-zephyr/llm/deployment/zephyr-7b-beta
+    huggingface:
+      containerPort: 8080
+      args:
+        - "--max-total-tokens"
+        - "4048"
+        - "--max-input-length"
+        - "3096"
+        #- --quantize
+        #- "awq"
+    replicaCount: 1
+    kind: Deployment
+    updateStrategy:
+      type: Recreate
+    image:
+      repo: ghcr.io/huggingface/text-generation-inference
+      tag: "latest"
+      pullPolicy: IfNotPresent
+    persistence:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: gp2
+      storage: 100Gi
+    resources:
+      requests:
+        cpu: "3"
+        memory: "10Gi"
+      limits:
+        nvidia.com/gpu: 1
