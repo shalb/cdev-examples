@@ -1,7 +1,7 @@
 ---
-title: "Kubernetes infrastructure for HF models and chat with Cluster.dev"
-thumbnail: /cluster.dev/assets/hf_thumbnail.png
-authors:
+Title: "Kubernetes infrastructure for HF models and chat with Cluster.dev"
+Thumbnail: /cluster.dev/assets/hf_thumbnail.png
+Authors:
 - user: voatsap
   guest: true
 ---
@@ -11,39 +11,36 @@ authors:
 
 ![HuggingFace Cluster.de](../../assets/hf_thumbnail.png)
 
-The goal in this article to show users how they could launch any LLM model from HuggingFace Hub with Chat into AWS cloud account on top of Kubernetes and make this production ready.
+The goal of this article is to show users how they could launch any LLM model from HuggingFace Hub with Chat into an AWS cloud account on top of Kubernetes and make this production-ready.
 
 ## HuggingFace TGI and Chat-UI
 
-The Hugging Face beside models datasets and python libraries also ships Docker containers that allow inference in loca
-There are two projects:
+Hugging Face, in addition to models, datasets, and Python libraries, also ships Docker containers for local inference. There are two projects:
 
-- [Text Generation Inference](https://github.com/huggingface/text-generation-inference/). Docker that could serve model.
-- [Chat-UI](https://github.com/huggingface/chat-ui/). Docker image that could be used for chatting with model(like ChatGPT interface).
+- [Text Generation Inference](https://github.com/huggingface/text-generation-inference/). A Docker container that can serve models.
+- [Chat-UI](https://github.com/huggingface/chat-ui/). A Docker image for chatting with models (similar to ChatGPT's interface).
 
-This looks enough if you need just deploy and test locally, but when you want to deploy this quickly to Kubernetes, there could be some pain and lot of configuration.
+This is sufficient if you just need to deploy and test locally. However, when you want to quickly deploy this to Kubernetes, there could be some pain and a lot of configuration.
 
-So we decided to simplify this journey for users who would like to just to spin some LLM models into their cloud accounts and don't want to bother with complex infrastructure development and management.
+So, we decided to simplify this journey for users who would like to spin up LLM models in their cloud accounts without dealing with complex infrastructure development and management.
 
 ## Kubernetes, Helm, Terraform and Cluster.dev
 
-Most of data scientist are using Python as an interface to test fine-tune and serve models, but when it comes to production, the DevOps teams need to pack tha into the infrastructure code. Additional point here is that with Kubernetes the price for GPU nodes would be at least 20% better then with Sagemaker, and you can scale them more flexible.
-Most of the production infrastructures are provisioned using Terraform, and the software are deployed to Kubernetes with Helm.  
+Most data scientists use Python as an interface to test, fine-tune, and serve models. However, when it comes to production, DevOps teams need to incorporate this into the infrastructure code. An additional point here is that with Kubernetes, the cost of GPU nodes would be at least 20% better than with SageMaker, and you can scale them more flexibly. Most production infrastructures are provisioned using Terraform, and software is deployed to Kubernetes with Helm. 
 
-[Cluster.dev](https://cluster.dev) (its our open-source framework) was designed especially for the task when you need to deploy a complete infrastructure and software with minimum commands and documentation. You can think about it as InstallShield (next->next->install) but for the Terraform, Helm to install any software to your cloud accounts.
+[Cluster.dev](https://cluster.dev) (it's our open-source framework) was designed especially for tasks where you need to deploy a complete infrastructure and software with minimal commands and documentation. You can think of it as InstallShield (next->next->install) but for Terraform and Helm to install any software to your cloud accounts.
 
 ## Quick Start on EKS
 
-To show the workflow we would use Amazon AWS cloud and managed EKS.
-But this could be adapted for any other cloud and Kuberentes version.
+To show the workflow we will use Amazon AWS cloud and managed EKS. But this can be adapted for any other cloud and Kuberentes version.
 
 ### Prerequisites
 
 - AWS cloud account credentials.
-- [AWS Quota](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-resource-limits.html#request-increase) change is requested for G5 or other desired types of instances.
+- [AWS Quota](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-resource-limits.html#request-increase) change requested for G5 or other desired types of instances.
 - [Cluster.dev](https://docs.cluster.dev/installation-upgrade/) and [Terraform](https://developer.hashicorp.com/terraform/downloads) installed.
 - Route53 DNS zone (optional).
-- Select HuggingFace model with .safetensors weights from Hub. Or you can upload model to s3 bucket, see example in [bootstrap.ipynb](bootstrap.ipynb)
+- Select a HuggingFace model with .safetensors weights from Hub. Alternatively, you can upload the model to an S3 bucket; see the example in [bootstrap.ipynb](bootstrap.ipynb)
 
 Create an S3 Bucket for storing state files:
 
@@ -51,7 +48,7 @@ Create an S3 Bucket for storing state files:
 aws s3 mb s3://cdev-states
 ```
 
-Clone repo with sample:
+Clone the repository with the sample:
 
 ```bash
 git clone https://github.com/shalb/cdev-examples/
@@ -60,17 +57,17 @@ cd cdev-examples/aws/eks-model/cluster.dev/
 
 ### Edit Configuration files
 
-`project.yaml` - main project config. Sets common global variables for the current project such as organization, region, state bucket name etc. Also could be used to set global environment variables.
+`project.yaml` - the main project configuration that sets common global variables for the current project, such as organization, region, state bucket name, etc. It can also be used to set global environment variables.
 
-`backend.yaml` - configures backend for Cluster.dev states (including Terraform states). Uses variables from project.yaml.
+`backend.yaml` - configures the backend for Cluster.dev states (including Terraform states) and uses variables from `project.yaml`.
 
-`stack-eks.yaml` - describes AWS infrastructure configuration. Includes VPC, Domains and EKS(Kubernetes) settings. [Stack docs.](https://docs.cluster.dev/examples-aws-eks/)
+`stack-eks.yaml` - describes AWS infrastructure configuration, including VPC, Domains, and EKS (Kubernetes) settings. Refer to the [Stack docs](https://docs.cluster.dev/examples-aws-eks/).
 
-The main configuration here about your GPU nodes, define its capacity_type (ON_DEMAND,SPOT), instance types and autoscalling (min/max/desired) settings. Also disk size and node labels if needed. Most important settings to configure next:
+The main configuration here is about your GPU nodes. Define their capacity_type (ON_DEMAND, SPOT), instance types, and autoscaling (min/max/desired) settings. Also, configure disk size and node labels if needed. The most important settings to configure next are:
 
 ```yaml
   cluster_name: k8s-model # change this to your cluster name
-  domain: cluster.dev # if you leave this domain it would be auto-delegated with zone *.cluster_name.cluster.dev
+  domain: cluster.dev # if you leave this domain it would be auto-delegated with the zone *.cluster_name.cluster.dev
   eks_managed_node_groups:
     gpu-nodes:
       name: ondemand-gpu-nodes
@@ -91,11 +88,11 @@ The main configuration here about your GPU nodes, define its capacity_type (ON_D
       min_size: 0
 ```
 
-You can create any additional node groups, just by adding similar blocks to this yaml. The whole list of available settings could be found in relative [Terraform module](https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/examples/eks_managed_node_group/main.tf#L96).
+You can create any additional node groups by adding similar blocks to this YAML. The complete list of available settings can be found in the relative [Terraform module](https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/examples/eks_managed_node_group/main.tf#L96).
 
-`stack-model.yaml` - describes the HF model Stack. It refers to model stackTemplate in `model-template` folder, it also installs required Nvidia drivers.
+`stack-model.yaml` - describes the HF model Stack. It refers to the model stackTemplate in the `model-template` folder, and it also installs the required Nvidia drivers.
 
-The model stack mostly uses the values from the [huggingface-model Helm chart](https://github.com/shalb/charts/tree/main/huggingface-model) we have prepared and continue its development. List of all available options for chart could be checked in default [values.yaml](https://github.com/shalb/charts/blob/main/huggingface-model/values.yaml). Here are the main things you need to change:
+The model stack mostly uses the values from the [huggingface-model Helm chart](https://github.com/shalb/charts/tree/main/huggingface-model) that we have prepared and continue its development. The list of all available options for the chart can be checked in the default [values.yaml](https://github.com/shalb/charts/blob/main/huggingface-model/values.yaml). Here are the main things you need to change:
 
 ```yaml
   chart:
@@ -130,13 +127,13 @@ The model stack mostly uses the values from the [huggingface-model Helm chart](h
 
 ## Deploy Stacks
 
-After you finished the configuration, you need to run just one command to deploy everything:
+After you finish the configuration, you need to run just one command to deploy everything:
 
 ```bash
 cdev apply
 ```
 
-Under the hood it would create the next set of resources:
+Under the hood, it would create the next set of resources:
 
 ```bash
 Plan results:
@@ -161,22 +158,22 @@ The process would take around 30 minutes, you can scroll this Asciinema to get a
 
 ## Working with Infrastructure
 
-So lets imagine some tasks we can perform on top of the stack.
+So, lets imagine some tasks we can perform on top of the stack.
 
 ### Interacting with Kubernetes
 
-After the stack would be deployed you will get the `kubeconfig` file that could be used for authorization to cluster and check workloads, logs etc..:
+After the stack is deployed, you will get the `kubeconfig` file that could be used for authorization to the cluster and check workloads, logs, etc.:
 
 ```bash
 # First we need to export KUBECONFIG to use kubectl
 export KUBECONFIG=`pwd`/kubeconfig
-# Then we can examine workloads deployed in `default` namespace, since we define it in stack-model.yaml
+# Then we can examine workloads deployed in the `default` namespace, since we have defined it in the stack-model.yaml
 kubectl get pod
-# To get logs from model startup, check if model is loaded without errors
+# To get logs from model startup, check if the model is loaded without errors
 kubectl logs -f <output model pod name from kubectl get pod>
-# To list services (should be model, chat and mongo if chat enabled)
+# To list services (should be model, chat and mongo if chat is enabled)
 kubectl get svc
-# Then you can port-forward service to your host
+# Then you can port-forward the service to your host
 kubectl port-forward svc/<model-output from above>  8080:8080
 # Now you can chat with your model
 curl 127.0.0.1:8080/generate \
@@ -187,9 +184,7 @@ curl 127.0.0.1:8080/generate \
 
 ### Changing nodes size and type
 
-Lets imagine we have a large model and we need to serve it with some really large instances.
-But we'd like to use spot-instances which are cheeper.
-So we need just to change type of node-group:
+Let's imagine we have a large model, and we need to serve it with some really large instances. But we'd like to use spot instances which are cheaper. So we need to change the type of the node group:
 
 ```yaml
     gpu-nodes:
@@ -211,12 +206,13 @@ So we need just to change type of node-group:
       min_size: 0
 ```
 
-And then just apply changes by running `cdev apply`.  
-Please note that spot instances not always available in region. If the spot request can't be fulfilled you can check in your AWS Console EC2 -> Auto Scaling groups -> eks-spot-gpu-nodes -> Activity, and when it fails try to change to `ON_DEMAND`, or change instance_types in manifest and re-run `cdev apply`.
+And then apply the changes by running `cdev apply`.  
+
+Please note that spot instances are not always available in the region. If the spot request can't be fulfilled, you can check in your AWS Console under EC2 -> Auto Scaling groups -> eks-spot-gpu-nodes -> Activity. If it fails, try changing to `ON_DEMAND` or modify instance_types in the manifest and rerun `cdev apply`.
 
 ### Changing the model
 
-In case you need to change the model, also just edit its name and organization:
+In case you need to change the model, simply edit its name and organization. Then apply the changes by running `cdev apply`:
 
 ```yaml
     model:
@@ -224,11 +220,9 @@ In case you need to change the model, also just edit its name and organization:
       name: "WizardCoder-15B-V1.0"
 ```
 
-And then just apply changes by running `cdev apply`.
-
 ### Enabling Chat-UI
 
-To enable Chat-UI, you need just to set `chart.chat.enable:true`. You will get a service that could be port-forwarded and used from browser. If you need to expose chat to external users, just to add `ingress` configuration, like in that sample:
+To enable Chat-UI, simply set `chart.chat.enable:true`. You will get a service that can be port-forwarded and used from the browser. If you need to expose the chat to external users, add ingress configuration, as shown in the sample:
 
 ```yaml
     chat:
@@ -252,6 +246,6 @@ To enable Chat-UI, you need just to set `chart.chat.enable:true`. You will get a
             secretName: huggingface-model-chat
 ```
 
-Note that if you are using `cluster.dev` domain with your project prefix(please make it unique) the DNS zone would be auto configured.
+Note that if you are using the `cluster.dev` domain with your project prefix (please make it unique), the DNS zone will be auto-configured. 
 
-Also if you'd like to expose API for your model, you can set the Ingress in corresponded model section.
+If you'd like to expose the API for your model, you can set the Ingress in the corresponding model section.
