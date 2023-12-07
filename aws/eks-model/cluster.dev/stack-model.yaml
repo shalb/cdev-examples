@@ -39,7 +39,13 @@ variables:
       storage: 100Gi
     resources:
       requests:
-        cpu: "3"
-        memory: "10Gi"
+        cpu: "1"
+        memory: "8Gi"
       limits:
         nvidia.com/gpu: 1
+    chat:
+      enabled: true
+      modelConfig:
+      extraEnvVars:
+        - name: PUBLIC_ORIGIN
+          value: "http://localhost:8080"

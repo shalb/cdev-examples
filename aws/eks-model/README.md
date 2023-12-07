@@ -28,7 +28,7 @@ So, we decided to simplify this journey for users who would like to spin up LLM 
 
 Most data scientists use Python as an interface to test, fine-tune, and serve models. However, when it comes to production, DevOps teams need to incorporate this into the infrastructure code. An additional point here is that with Kubernetes, the cost of GPU nodes would be at least 20% better than with SageMaker, and you can scale them more flexibly. Most production infrastructures are provisioned using Terraform, and software is deployed to Kubernetes with Helm. 
 
-[Cluster.dev](https://cluster.dev) (it's our open-source framework) was designed especially for tasks where you need to deploy a complete infrastructure and software with minimal commands and documentation. You can think of it as InstallShield (next->next->install) but for Terraform and Helm to install any software to your cloud accounts.
+[Cluster.dev](https://cluster.dev) (it's open-source framework) was designed especially for tasks where you need to deploy a complete infrastructure and software with minimal commands and documentation. You can think of it as InstallShield (next->next->install) but for Terraform and Helm to install any software to your cloud accounts. More details could be found in [docs.cluster.dev](https://docs.cluster.dev).
 
 ## Quick Start on EKS
 
@@ -37,10 +37,11 @@ To show the workflow we will use Amazon AWS cloud and managed EKS. But this can 
 ### Prerequisites
 
 - AWS cloud account credentials.
-- [AWS Quota](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-resource-limits.html#request-increase) change requested for G5 or other desired types of instances.
-- [Cluster.dev](https://docs.cluster.dev/installation-upgrade/) and [Terraform](https://developer.hashicorp.com/terraform/downloads) installed.
+- [AWS Quota](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-resource-limits.html#request-increase) change requested for g5 or other desired types of GPU instances.
+- [Cluster.dev](https://docs.cluster.dev/installation-upgrade/) and [Terraform](https://developer.hashicorp.com/terraform/downloads) 
+installed.
+- Select a HuggingFace model with .safetensors weights from Hub. Alternatively, you can upload the model to an S3 bucket; see the example in [bootstrap.ipynb](https://github.com/shalb/cdev-examples/blob/main/aws/eks-model/bootstrap.ipynb).
 - Route53 DNS zone (optional).
-- Select a HuggingFace model with .safetensors weights from Hub. Alternatively, you can upload the model to an S3 bucket; see the example in [bootstrap.ipynb](bootstrap.ipynb)
 
 Create an S3 Bucket for storing state files:
 
@@ -48,7 +49,7 @@ Create an S3 Bucket for storing state files:
 aws s3 mb s3://cdev-states
 ```
 
-Clone the repository with the sample:
+Clone the repository with the example:
 
 ```bash
 git clone https://github.com/shalb/cdev-examples/
@@ -206,7 +207,7 @@ Let's imagine we have a large model, and we need to serve it with some really la
       min_size: 0
 ```
 
-And then apply the changes by running `cdev apply`.  
+And then apply the changes by running `cdev apply`.
 
 Please note that spot instances are not always available in the region. If the spot request can't be fulfilled, you can check in your AWS Console under EC2 -> Auto Scaling groups -> eks-spot-gpu-nodes -> Activity. If it fails, try changing to `ON_DEMAND` or modify instance_types in the manifest and rerun `cdev apply`.
 
@@ -246,6 +247,26 @@ To enable Chat-UI, simply set `chart.chat.enable:true`. You will get a service t
             secretName: huggingface-model-chat
 ```
 
-Note that if you are using the `cluster.dev` domain with your project prefix (please make it unique), the DNS zone will be auto-configured. 
+Note that if you are using the `cluster.dev` domain with your project prefix (please make it unique), the DNS zone will be auto-configured. The https certificates for domain would be generated automatically to check the progress use:
+```kubectl describe certificaterequests.cert-manager.io```
 
 If you'd like to expose the API for your model, you can set the Ingress in the corresponding model section.
+
+### Monitoring and Metrics
+
+The instruction to set-up prometheus and grafana to monitor you can find in [bootstrap.ipynb](https://github.com/shalb/cdev-examples/blob/main/aws/eks-model/bootstrap.ipynb).
+We plan to release a new stack template with monitoring enabled by one option.
+
+In this loom video, you can see the configuration for Grafana:
+<div>
+    <a href="https://www.loom.com/share/836de3be322a4d51b7baf628d1ed9801">
+    </a>
+    <a href="https://www.loom.com/share/836de3be322a4d51b7baf628d1ed9801">
+      <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/836de3be322a4d51b7baf628d1ed9801-with-play.gif">
+    </a>
+  </div>
+
+
+## Questions, Help and Feature Requests
+
+Feel free to use GitHub repository [Discussions](https://github.com/shalb/cdev-examples/discussions).
