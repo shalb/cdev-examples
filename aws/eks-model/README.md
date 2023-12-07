@@ -258,14 +258,8 @@ The instruction to set-up prometheus and grafana to monitor you can find in [boo
 We plan to release a new stack template with monitoring enabled by one option.
 
 In this loom video, you can see the configuration for Grafana:
-<div>
-    <a href="https://www.loom.com/share/836de3be322a4d51b7baf628d1ed9801">
-    </a>
-    <a href="https://www.loom.com/share/836de3be322a4d51b7baf628d1ed9801">
-      <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/836de3be322a4d51b7baf628d1ed9801-with-play.gif">
-    </a>
-  </div>
 
+[![Grafana GPU config](https://cdn.loom.com/sessions/thumbnails/836de3be322a4d51b7baf628d1ed9801-with-play.gif)](https://www.loom.com/share/836de3be322a4d51b7baf628d1ed9801)
 
 ## Questions, Help and Feature Requests
 
