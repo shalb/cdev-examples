@@ -13,7 +13,7 @@ variables:
       name: "zephyr-7b-beta"
     init:
       s3:
-        enabled: true
+        enabled: false
         bucketURL: s3://k8s-model-zephyr/llm/deployment/zephyr-7b-beta
     huggingface:
       containerPort: 8080
