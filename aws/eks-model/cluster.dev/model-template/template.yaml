@@ -11,7 +11,7 @@ units:
     type: helm
     source:
       chart: "huggingface-model"
-      version: {{  default "0.1.7" .variables.chart.version }}
+      version: {{  default "0.2.0" .variables.chart.version }}
     kubeconfig: {{ .variables.kubeconfig }}
     depends_on: this.nvidia-device-plugin
     values:
